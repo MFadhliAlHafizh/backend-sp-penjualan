@@ -24,10 +24,6 @@ if (!$db) {
 
 $kriteria = new Kriteria($db);
 
-// ambil method & endpoint
-$method = $_SERVER['REQUEST_METHOD'];
-$request = $_GET['url'] ?? '';
-
 header("Content-Type: application/json");
 
 // parsing input JSON
@@ -41,21 +37,40 @@ function response($status, $data = null, $message = "") {
     ]);
 }
 
-// ROUTING
-switch ($request) {
+// ambil method & endpoint
+$method = $_SERVER['REQUEST_METHOD'];
+$request = $_GET['url'] ?? '';
+$segments = explode('/', trim($request, '/'));
+$resource = $segments[0] ?? null;
+$id = $segments[1] ?? null;
+
+switch ($resource) {
 
     case 'kriteria':
-        // GET ALL
+
+        // GET ALL atau GET BY ID
         if ($method === 'GET') {
 
-            $result = $kriteria->getAll();
+            if ($id) {
+                $result = $kriteria->getById($id);
 
-            if ($result !== false) {
-                http_response_code(200);
-                response("success", $result, "Data retrieved successfully");
+                if ($result) {
+                    http_response_code(200);
+                    response("success", $result, "Data found");
+                } else {
+                    http_response_code(404);
+                    response("error", null, "Data not found");
+                }
             } else {
-                http_response_code(500);
-                response("error", null, "Failed to retrieve data");
+                $result = $kriteria->getAll();
+
+                if ($result !== false) {
+                    http_response_code(200);
+                    response("success", $result, "Data retrieved successfully");
+                } else {
+                    http_response_code(500);
+                    response("error", null, "Failed to retrieve data");
+                }
             }
             exit();
         }
@@ -80,38 +95,9 @@ switch ($request) {
             }
             exit();
         }
-        break;
 
-    // GET BY ID
-    case 'kriteria/show':
-        if ($method === 'GET') {
-
-            $id = $_GET['id'] ?? null;
-
-            if (!$id) {
-                http_response_code(400);
-                response("error", null, "ID is required");
-                exit();
-            }
-
-            $result = $kriteria->getById($id);
-
-            if ($result) {
-                http_response_code(200);
-                response("success", $result, "Data found");
-            } else {
-                http_response_code(404);
-                response("error", null, "Data not found");
-            }
-            exit();
-        }
-        break;
-
-    // UPDATE
-    case 'kriteria/update':
+        // UPDATE
         if ($method === 'PUT') {
-
-            $id = $_GET['id'] ?? null;
 
             if (!$id || !$input) {
                 http_response_code(400);
@@ -130,13 +116,9 @@ switch ($request) {
             }
             exit();
         }
-        break;
 
-    // DELETE
-    case 'kriteria/delete':
+        // DELETE
         if ($method === 'DELETE') {
-
-            $id = $_GET['id'] ?? null;
 
             if (!$id) {
                 http_response_code(400);
@@ -157,7 +139,6 @@ switch ($request) {
         }
         break;
 
-    // DEFAULT
     default:
         http_response_code(404);
         response("error", null, "Route not found");
