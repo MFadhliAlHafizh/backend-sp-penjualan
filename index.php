@@ -15,6 +15,10 @@ switch ($resource) {
         require_once __DIR__ . '/routes/platformRoute.php';
         break;
 
+    case 'register':
+        require_once __DIR__ . '/routes/authenticationRoute.php';
+        break;
+
     default:
         header("Content-Type: application/json");
         http_response_code(404);
