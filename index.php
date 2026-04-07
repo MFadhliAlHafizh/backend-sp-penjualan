@@ -16,6 +16,7 @@ switch ($resource) {
         break;
 
     case 'register':
+    case 'login':
         require_once __DIR__ . '/routes/authenticationRoute.php';
         break;
 

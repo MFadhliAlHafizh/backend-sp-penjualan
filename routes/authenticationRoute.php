@@ -12,6 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../models/AuthenticationModel.php';
 require_once __DIR__ . '/../Validator.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+$jwtConfig = require __DIR__ . '/../config/jwt.php';
 
 // koneksi DB
 $database = new Database();
@@ -23,7 +27,7 @@ if (!$db) {
     exit();
 }
 
-$register = new Authentication($db);
+$auth = new Authentication($db);
 $validator = new Validator($db);
 
 header("Content-Type: application/json");
@@ -53,7 +57,7 @@ switch ($resource) {
         // GET BY ID
         if ($method === 'GET') {
 
-            $result = $register->getById($id);
+            $result = $auth->getById($id);
             
             if ($result) {
                 http_response_code(200);
@@ -74,7 +78,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $register->create($input);
+            $result = $auth->create($input);
 
             if ($result) {
                 unset($result['password']);
@@ -86,6 +90,60 @@ switch ($resource) {
             }
             exit();
         }
+        break;
+
+    case 'login':
+
+        if ($method === 'POST') {
+
+            if (!$input || empty($input['email']) || empty($input['password'])) {
+                http_response_code(400);
+                response("error", null, "Email dan password wajib diisi");
+                exit();
+            }
+
+            // cek user berdasarkan email
+            $user = $auth->getByEmail($input['email']);
+
+            if (!$user) {
+                http_response_code(404);
+                response("error", null, "Email tidak ditemukan");
+                exit();
+            }
+
+            // verifikasi password
+            if (!password_verify($input['password'], $user['password'])) {
+                http_response_code(401);
+                response("error", null, "Password salah");
+                exit();
+            }
+
+            // 🔐 generate JWT
+            $payload = [
+                "iss" => $jwtConfig['issuer'],
+                "aud" => $jwtConfig['audience'],
+                "iat" => time(),
+                "exp" => time() + $jwtConfig['expire'],
+                "data" => [
+                    "id_user" => $user['id_user'],
+                    "email" => $user['email'],
+                    "peran" => $user['peran']
+                ]
+            ];
+
+            $jwt = JWT::encode($payload, $jwtConfig['key'], 'HS256');
+
+            // hapus password dari response
+            unset($user['password']);
+
+            http_response_code(200);
+            response("success", [
+                "user" => $user,
+                "token" => $jwt
+            ], "Login berhasil");
+            exit();
+        }
+        break;
 
     default:
         http_response_code(404);

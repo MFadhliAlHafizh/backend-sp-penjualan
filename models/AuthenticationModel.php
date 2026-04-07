@@ -25,6 +25,24 @@ class Authentication {
         }
     }
 
+    // GET BY EMAIL
+    public function getByEmail($email) {
+        $stmt = $this->conn->prepare(
+            "SELECT * FROM {$this->table} WHERE email = ? LIMIT 1"
+        );
+
+        if (!$stmt) {
+        die($this->conn->error);
+        }
+
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        return $result->num_rows > 0 ? $result->fetch_assoc() : null;
+    }    
+
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
