@@ -20,6 +20,10 @@ switch ($resource) {
         require_once __DIR__ . '/routes/authenticationRoute.php';
         break;
 
+    case 'akun':
+        require_once __DIR__ . '/routes/akunRoute.php';
+        break;
+
     default:
         header("Content-Type: application/json");
         http_response_code(404);
