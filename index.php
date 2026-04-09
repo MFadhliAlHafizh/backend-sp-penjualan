@@ -24,6 +24,10 @@ switch ($resource) {
         require_once __DIR__ . '/routes/akunRoute.php';
         break;
 
+    case 'rules':
+        require_once __DIR__ . '/routes/rulesRoute.php';
+        break;
+
     default:
         header("Content-Type: application/json");
         http_response_code(404);
