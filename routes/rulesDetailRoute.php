@@ -32,6 +32,9 @@ if (!$db) {
 
 $rulesDetail = new RulesDetail($db);
 
+// parsing input JSON
+$input = json_decode(file_get_contents("php://input"), true);
+
 $method = $_SERVER['REQUEST_METHOD'];
 $request = $_GET['url'] ?? '';
 $segments = explode('/', trim($request, '/'));
@@ -62,9 +65,69 @@ switch ($subResource) {
             exit();
         }
 
-        http_response_code(405);
-        response("error", null, "Method not allowed");
-        exit();
+        // CREATE
+        if ($method === 'POST') {
+
+            if (!$input) {
+                http_response_code(400);
+                response("error", null, "Invalid input");
+                exit();
+            }
+
+            $result = $rulesDetail->create($input);
+
+            if ($result) {
+                http_response_code(201);
+                response("success", $result, "Data created successfully");
+            } else {
+                http_response_code(500);
+                response("error", null, "Failed to create data");
+            }
+            exit();
+        }
+
+        // UPDATE
+        if ($method === 'PUT') {
+
+            if (!$id || !$input) {
+                http_response_code(400);
+                response("error", null, "Invalid ID or input");
+                exit();
+            }
+
+            $result = $rulesDetail->update($id, $input);
+
+            if ($result) {
+                http_response_code(200);
+                response("success", $result, "Data updated successfully");
+            } else {
+                http_response_code(500);
+                response("error", null, "Failed to update data");
+            }
+            exit();
+        }
+
+        // DELETE
+        if ($method === 'DELETE') {
+
+            if (!$id) {
+                http_response_code(400);
+                response("error", null, "ID is required");
+                exit();
+            }
+
+            $result = $rulesDetail->delete($id);
+
+            if ($result) {
+                http_response_code(200);
+                response("success", null, "Data deleted successfully");
+            } else {
+                http_response_code(500);
+                response("error", null, "Failed to delete data");
+            }
+            exit();
+        }
+        break;
 
     default:
         http_response_code(404);

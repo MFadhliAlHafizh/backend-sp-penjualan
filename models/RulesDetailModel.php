@@ -44,4 +44,82 @@ class RulesDetail {
 
         return $data;
     }
+
+    // GET BY ID
+    public function getByConditionId($id) {
+        $stmt = $this->conn->prepare(
+            "SELECT * FROM " . $this->conditionsTable . " WHERE id_condition = ?"
+        );
+
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        } else {
+            return null;
+        }
+    }
+
+    // CREATE
+    public function create($data) {
+        $stmt = $this->conn->prepare(
+            "INSERT INTO {$this->conditionsTable} (id_rule, id_kriteria, jawaban) VALUES (?, ?, ?)"
+        );
+
+        $stmt->bind_param(
+            "iii",
+            $data['id_rule'],
+            $data['id_kriteria'],
+            $data['jawaban']
+        );
+
+        if ($stmt->execute()) {
+            $id = $this->conn->insert_id;
+
+            // ambil data yang baru dibuat
+            return $this->getByConditionId($id);
+        } else {
+            return false;
+        }
+    }
+
+    // UPDATE
+    public function update($id, $data) {
+        $stmt = $this->conn->prepare(
+            "UPDATE " . $this->conditionsTable . " 
+            SET id_rule = ?, 
+                id_kriteria = ?, 
+                jawaban = ?
+            WHERE id_condition = ?"
+        );
+
+        $stmt->bind_param(
+            "iiii",
+            $data['id_rule'],
+            $data['id_kriteria'],
+            $data['jawaban'],
+            $id
+        );
+
+        if ($stmt->execute()) {
+            // ambil data terbaru setelah update
+            return $this->getByConditionId($id);
+        } else {
+            return false;
+        }
+    }
+
+    // DELETE
+    public function delete($id) {
+        $stmt = $this->conn->prepare(
+            "DELETE FROM " . $this->conditionsTable . " WHERE id_condition = ?"
+        );
+
+        $stmt->bind_param("i", $id);
+
+        return $stmt->execute();
+    }    
 }
