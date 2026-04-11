@@ -25,7 +25,11 @@ switch ($resource) {
         break;
 
     case 'rules':
-        require_once __DIR__ . '/routes/rulesRoute.php';
+        if (($segments[1] ?? '') === 'detail') {
+            require_once __DIR__ . '/routes/rulesDetailRoute.php';
+        } else {
+            require_once __DIR__ . '/routes/rulesRoute.php';
+        }
         break;
 
     default:
