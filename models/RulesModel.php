@@ -1,8 +1,8 @@
 <?php
 class Rules {
     private $conn;
-    private $rulestable = "rules";
-    private $platformtable = "platform";
+    private $rulesTable = "rules";
+    private $platformTable = "platform";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -14,8 +14,8 @@ class Rules {
             SELECT 
                 r.*,
                 p.nama_platform
-            FROM {$this->rulestable} r
-            JOIN {$this->platformtable} p
+            FROM {$this->rulesTable} r
+            JOIN {$this->platformTable} p
             ON r.id_platform = p.id_platform
         ";
         $result = $this->conn->query($query);
@@ -37,8 +37,8 @@ class Rules {
             SELECT
                 r.*,
                 p.nama_platform
-            FROM {$this->rulestable} r
-            JOIN {$this->platformtable} p
+            FROM {$this->rulesTable} r
+            JOIN {$this->platformTable} p
             ON r.id_platform = p.id_platform
             WHERE r.id_rule = ?
         ");
@@ -58,7 +58,7 @@ class Rules {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->rulestable} (kode_rule, id_platform, total_conditions) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->rulesTable} (kode_rule, id_platform, total_conditions) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
@@ -81,7 +81,7 @@ class Rules {
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
-            "DELETE FROM " . $this->rulestable . " WHERE id_rule = ?"
+            "DELETE FROM " . $this->rulesTable . " WHERE id_rule = ?"
         );
 
         $stmt->bind_param("i", $id);
