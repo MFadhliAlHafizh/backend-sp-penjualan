@@ -11,6 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/../models/PlatformModel.php';
 
+header("Content-Type: application/json");
+
+function response($status, $data = null, $message = "") {
+    echo json_encode([
+        "status" => $status,
+        "message" => $message,
+        "data" => $data
+    ]);
+}
+
 // koneksi DB
 $database = new Database();
 $db = $database->connect();
@@ -23,18 +33,8 @@ if (!$db) {
 
 $platform = new Platform($db);
 
-header("Content-Type: application/json");
-
 // parsing input JSON
 $input = json_decode(file_get_contents("php://input"), true);
-
-function response($status, $data = null, $message = "") {
-    echo json_encode([
-        "status" => $status,
-        "message" => $message,
-        "data" => $data
-    ]);
-}
 
 // ambil method & endpoint
 $method = $_SERVER['REQUEST_METHOD'];

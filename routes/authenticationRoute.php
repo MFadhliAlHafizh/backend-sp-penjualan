@@ -12,8 +12,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/../models/AuthenticationModel.php';
 require_once __DIR__ . '/../Validator.php';
 
-use Firebase\JWT\JWT;
-$jwtConfig = require __DIR__ . '/../config/jwt.php';
+header("Content-Type: application/json");
+
+function response($status, $data = null, $message = "") {
+    echo json_encode([
+        "status" => $status,
+        "message" => $message,
+        "data" => $data
+    ]);
+}
 
 // koneksi DB
 $database = new Database();
@@ -25,21 +32,14 @@ if (!$db) {
     exit();
 }
 
+use Firebase\JWT\JWT;
+$jwtConfig = require __DIR__ . '/../config/jwt.php';
+
 $auth = new Authentication($db);
 $validator = new Validator($db);
 
-header("Content-Type: application/json");
-
 // parsing input JSON
 $input = json_decode(file_get_contents("php://input"), true);
-
-function response($status, $data = null, $message = "") {
-    echo json_encode([
-        "status" => $status,
-        "message" => $message,
-        "data" => $data
-    ]);
-}
 
 // ambil method & endpoint
 $method = $_SERVER['REQUEST_METHOD'];
