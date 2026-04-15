@@ -1,5 +1,8 @@
 <?php
 
+require_once __DIR__ . '/config/database.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
 $url = $_GET['url'] ?? '';
 $segments = explode('/', $url);
 
@@ -30,6 +33,10 @@ switch ($resource) {
         } else {
             require_once __DIR__ . '/routes/rulesRoute.php';
         }
+        break;
+
+    case 'riwayat':
+        require_once __DIR__ . '/routes/riwayatRoute.php';
         break;
 
     default:
