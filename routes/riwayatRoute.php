@@ -47,10 +47,9 @@ switch ($resource) {
     case 'riwayat':
 
         // GET ALL
-        if ($method === 'GET') {
+        if ($method === 'GET' && !$id) {
 
             $user = getUserFromToken();
-
             $id_user = $user['id_user'];
             $peran = $user['peran'];
 
@@ -64,6 +63,25 @@ switch ($resource) {
                 response("error", null, "Failed to retrieve data");
             }
         }
+
+        if ($method === 'GET' && $id) {
+
+            $profile = $riwayat->getProfileByConsultationId($id);
+            $responses = $riwayat->getResponsesByConsultationId($id);
+            $results = $riwayat->getResultsByConsultationId($id);
+
+            if ($profile) {
+                http_response_code(200);
+                response("success", [
+                    "profile" => $profile,
+                    "responses" => $responses,
+                    "results" => $results
+                ], "Detail retrieved successfully");
+            } else {
+                http_response_code(404);
+                response("error", null, "Data not found");
+            }
+        }        
 
         // DELETE
         if ($method === 'DELETE') {

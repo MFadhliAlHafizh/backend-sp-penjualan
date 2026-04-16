@@ -3,6 +3,10 @@ class Riwayat {
     private $conn;
     private $konsultasiTable = "konsultasi";
     private $akunTable = "akun";
+    private $kriteriaTable = "kriteria";
+    private $platformTable = "platform";
+    private $jawabanKonsultasiTable = "jawaban_konsultasi";
+    private $hasilKonsultasiTable = "hasil_konsultasi";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -42,6 +46,77 @@ class Riwayat {
             $data[] = $row;
         }
 
+        return $data;
+    }
+
+    public function getProfileByConsultationId($id) {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                a.username,
+                a.email,
+                k.tanggal
+            FROM {$this->konsultasiTable} k
+            JOIN {$this->akunTable} a ON k.id_user = a.id_user
+            WHERE k.id_konsultasi = ?"
+        );
+
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        } else {
+            return null;
+        }
+    }
+
+    public function getResponsesByConsultationId($id) {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                kr.pertanyaan,
+                jk.jawaban_user
+            FROM {$this->jawabanKonsultasiTable} jk
+            JOIN {$this->kriteriaTable} kr ON jk.id_kriteria = kr.id_kriteria
+            WHERE jk.id_konsultasi = ?
+            ORDER BY kr.id_kriteria ASC"
+        );
+
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
+        return $data;
+    }
+
+    public function getResultsByConsultationId($id) {
+        $stmt = $this->conn->prepare(
+            "SELECT
+                p.nama_platform,
+                hk.terpenuhi,
+                hk.total_kondisi,
+                hk.persen
+            FROM {$this->hasilKonsultasiTable} hk
+            JOIN {$this->platformTable} p ON hk.id_platform = p.id_platform
+            WHERE hk.id_konsultasi = ?
+            ORDER BY hk.persen DESC"
+        );
+
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        $data = [];
+        while ($row = $result->fetch_assoc()) {
+            $data[] = $row;
+        }
         return $data;
     }
 
