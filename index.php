@@ -39,6 +39,10 @@ switch ($resource) {
         require_once __DIR__ . '/routes/riwayatRoute.php';
         break;
 
+    case 'konsultasi':
+        require_once __DIR__ . '/routes/konsultasiRoute.php';
+        break;
+
     default:
         header("Content-Type: application/json");
         http_response_code(404);
