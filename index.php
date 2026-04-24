@@ -14,8 +14,8 @@ switch ($resource) {
         require_once __DIR__ . '/routes/kriteriaRoute.php';
         break;
 
-    case 'platform':
-        require_once __DIR__ . '/routes/platformRoute.php';
+    case 'penyebab':
+        require_once __DIR__ . '/routes/penyebabRoute.php';
         break;
 
     case 'register':

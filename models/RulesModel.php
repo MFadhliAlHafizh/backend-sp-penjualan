@@ -2,7 +2,7 @@
 class Rules {
     private $conn;
     private $rulesTable = "rules";
-    private $platformTable = "platform";
+    private $penyebabTable = "penyebab";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -13,10 +13,10 @@ class Rules {
         $query = "
             SELECT 
                 r.*,
-                p.nama_platform
+                p.nama_penyebab
             FROM {$this->rulesTable} r
-            JOIN {$this->platformTable} p
-            ON r.id_platform = p.id_platform
+            JOIN {$this->penyebabTable} p
+            ON r.id_penyebab = p.id_penyebab
         ";
         $result = $this->conn->query($query);
 
@@ -36,11 +36,11 @@ class Rules {
         $stmt = $this->conn->prepare("
             SELECT
                 r.*,
-                p.nama_platform
+                p.nama_penyebab
             FROM {$this->rulesTable} r
-            JOIN {$this->platformTable} p
-            ON r.id_platform = p.id_platform
-            WHERE r.id_rule = ?
+            JOIN {$this->penyebabTable} p
+            ON r.id_penyebab = p.id_penyebab
+            WHERE r.id_rules = ?
         ");
 
         $stmt->bind_param("i", $id);
@@ -58,14 +58,14 @@ class Rules {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->rulesTable} (kode_rule, id_platform, total_conditions) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->rulesTable} (kode_rules, id_penyebab, total_kondisi) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
             "sii",
-            $data['kode_rule'],
-            $data['id_platform'],
-            $data['total_conditions']
+            $data['kode_rules'],
+            $data['id_penyebab'],
+            $data['total_kondisi']
         );
 
         if ($stmt->execute()) {
@@ -81,7 +81,7 @@ class Rules {
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
-            "DELETE FROM " . $this->rulesTable . " WHERE id_rule = ?"
+            "DELETE FROM " . $this->rulesTable . " WHERE id_rules = ?"
         );
 
         $stmt->bind_param("i", $id);

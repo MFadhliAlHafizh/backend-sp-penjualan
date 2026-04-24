@@ -6,8 +6,8 @@ class Konsultasi {
     private $tableJawaban = "jawaban_konsultasi";
     private $tableHasil = "hasil_konsultasi";
     private $tableRules = "rules";
-    private $tableConditions = "rule_conditions";
-    private $tablePlatform = "platform";
+    private $tableKondisi = "kondisi";
+    private $tablePenyebab = "penyebab";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -39,15 +39,17 @@ class Konsultasi {
         // 3️⃣ Ambil rules
         $sql = "
             SELECT 
-                r.id_rule,
-                r.id_platform,
-                r.total_conditions,
-                p.nama_platform,
+                r.id_rules,
+                r.id_penyebab,
+                r.total_kondisi,
+                p.nama_penyebab,
+                p.deskripsi,
+                p.solusi,
                 rc.id_kriteria,
-                rc.jawaban AS jawaban_rule
+                rc.jawaban AS jawaban_rules
             FROM {$this->tableRules} r
-            JOIN {$this->tableConditions} rc ON r.id_rule = rc.id_rule
-            JOIN {$this->tablePlatform} p ON r.id_platform = p.id_platform
+            JOIN {$this->tableKondisi} rc ON r.id_rules = rc.id_rules
+            JOIN {$this->tablePenyebab} p ON r.id_penyebab = p.id_penyebab
         ";
 
         $result = $this->conn->query($sql);
@@ -60,21 +62,23 @@ class Konsultasi {
         $grouped = [];
 
         while ($row = $result->fetch_assoc()) {
-            $id_rule = $row['id_rule'];
+            $id_rules = $row['id_rules'];
 
-            if (!isset($grouped[$id_rule])) {
-                $grouped[$id_rule] = [
-                    "id_rule" => $id_rule,
-                    "id_platform" => $row['id_platform'],
-                    "nama_platform" => $row['nama_platform'],
-                    "total_conditions" => $row['total_conditions'],
-                    "conditions" => []
+            if (!isset($grouped[$id_rules])) {
+                $grouped[$id_rules] = [
+                    "id_rules" => $id_rules,
+                    "id_penyebab" => $row['id_penyebab'],
+                    "nama_penyebab" => $row['nama_penyebab'],
+                    "deskripsi" => $row['deskripsi'],
+                    "solusi" => $row['solusi'],
+                    "total_kondisi" => $row['total_kondisi'],
+                    "kondisi" => []
                 ];
             }
 
-            $grouped[$id_rule]["conditions"][] = [
+            $grouped[$id_rules]["kondisi"][] = [
                 "id_kriteria" => $row['id_kriteria'],
-                "jawaban_rule" => $row['jawaban_rule']
+                "jawaban_rules" => $row['jawaban_rules']
             ];
         }
 
@@ -84,21 +88,23 @@ class Konsultasi {
         foreach ($grouped as $rule) {
             $terpenuhi = 0;
 
-            foreach ($rule["conditions"] as $c) {
+            foreach ($rule["kondisi"] as $c) {
                 $userInput = isset($jawaban[$c["id_kriteria"]]) ? $jawaban[$c["id_kriteria"]] : 0;
 
-                if ($userInput == $c["jawaban_rule"]) {
+                if ($userInput == $c["jawaban_rules"]) {
                     $terpenuhi++;
                 }
             }
 
-            $persen = round(($terpenuhi / $rule["total_conditions"]) * 100);
+            $persen = round(($terpenuhi / $rule["total_kondisi"]) * 100);
 
             $resultAkhir[] = [
-                "id_platform" => $rule["id_platform"],
-                "nama_platform" => $rule["nama_platform"],
+                "id_penyebab" => $rule["id_penyebab"],
+                "nama_penyebab" => $rule["nama_penyebab"],
+                "deskripsi" => $rule["deskripsi"],
+                "solusi" => $rule["solusi"],
                 "terpenuhi" => $terpenuhi,
-                "total_kondisi" => $rule["total_conditions"],
+                "total_kondisi" => $rule["total_kondisi"],
                 "persen" => $persen
             ];
         }
@@ -112,14 +118,14 @@ class Konsultasi {
 
         // 7️⃣ Simpan hasil
         $stmtHasil = $this->conn->prepare(
-            "INSERT INTO {$this->tableHasil} (id_konsultasi, id_platform, terpenuhi, total_kondisi, persen) VALUES (?, ?, ?, ?, ?)"
+            "INSERT INTO {$this->tableHasil} (id_konsultasi, id_penyebab, terpenuhi, total_kondisi, persen) VALUES (?, ?, ?, ?, ?)"
         );
 
         foreach ($top2 as $h) {
             $stmtHasil->bind_param(
                 "iiiii",
                 $id_konsultasi,
-                $h["id_platform"],
+                $h["id_penyebab"],
                 $h["terpenuhi"],
                 $h["total_kondisi"],
                 $h["persen"]

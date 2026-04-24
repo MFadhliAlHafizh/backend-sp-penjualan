@@ -4,7 +4,7 @@ class Riwayat {
     private $konsultasiTable = "konsultasi";
     private $akunTable = "akun";
     private $kriteriaTable = "kriteria";
-    private $platformTable = "platform";
+    private $penyebabTable = "penyebab";
     private $jawabanKonsultasiTable = "jawaban_konsultasi";
     private $hasilKonsultasiTable = "hasil_konsultasi";
 
@@ -98,12 +98,14 @@ class Riwayat {
     public function getResultsByConsultationId($id) {
         $stmt = $this->conn->prepare(
             "SELECT
-                p.nama_platform,
+                p.nama_penyebab,
+                p.deskripsi,
+                p.solusi,
                 hk.terpenuhi,
                 hk.total_kondisi,
                 hk.persen
             FROM {$this->hasilKonsultasiTable} hk
-            JOIN {$this->platformTable} p ON hk.id_platform = p.id_platform
+            JOIN {$this->penyebabTable} p ON hk.id_penyebab = p.id_penyebab
             WHERE hk.id_konsultasi = ?
             ORDER BY hk.persen DESC"
         );

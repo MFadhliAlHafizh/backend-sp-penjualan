@@ -2,37 +2,37 @@
 class RulesDetail {
     private $conn;
     private $kriteriaTable = "kriteria";
-    private $platformTable = "platform";
+    private $penyebabTable = "penyebab";
     private $rulesTable = "rules";
-    private $conditionsTable = "rule_conditions";
+    private $kondisiTable = "kondisi";
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
-    // GET BY RULE ID
-    public function getByRuleId($idRule) {
+    // GET BY RULES ID
+    public function getByRulesId($idRules) {
         $stmt = $this->conn->prepare("
             SELECT
-                r.id_rule,
-                r.kode_rule,
-                r.total_conditions,
+                r.id_rules,
+                r.kode_rules,
+                r.total_kondisi,
 
-                p.nama_platform,
+                p.nama_penyebab,
 
-                rc.id_condition,
+                rc.id_kondisi,
                 rc.jawaban,
 
                 k.nama_kriteria,
                 k.pertanyaan
             FROM {$this->rulesTable} r
-            JOIN {$this->platformTable} p ON r.id_platform = p.id_platform
-            JOIN {$this->conditionsTable} rc ON r.id_rule = rc.id_rule
+            JOIN {$this->penyebabTable} p ON r.id_penyebab = p.id_penyebab
+            JOIN {$this->kondisiTable} rc ON r.id_rules = rc.id_rules
             JOIN {$this->kriteriaTable} k ON rc.id_kriteria = k.id_kriteria
-            WHERE r.id_rule = ?
+            WHERE r.id_rules = ?
         ");
 
-        $stmt->bind_param("i", $idRule);
+        $stmt->bind_param("i", $idRules);
         $stmt->execute();
 
         $result = $stmt->get_result();
@@ -46,9 +46,9 @@ class RulesDetail {
     }
 
     // GET BY ID
-    public function getByConditionId($id) {
+    public function getByKondisiId($id) {
         $stmt = $this->conn->prepare(
-            "SELECT * FROM " . $this->conditionsTable . " WHERE id_condition = ?"
+            "SELECT * FROM " . $this->kondisiTable . " WHERE id_kondisi = ?"
         );
 
         $stmt->bind_param("i", $id);
@@ -66,12 +66,12 @@ class RulesDetail {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->conditionsTable} (id_rule, id_kriteria, jawaban) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->kondisiTable} (id_rules, id_kriteria, jawaban) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
             "iii",
-            $data['id_rule'],
+            $data['id_rules'],
             $data['id_kriteria'],
             $data['jawaban']
         );
@@ -80,7 +80,7 @@ class RulesDetail {
             $id = $this->conn->insert_id;
 
             // ambil data yang baru dibuat
-            return $this->getByConditionId($id);
+            return $this->getByKondisiId($id);
         } else {
             return false;
         }
@@ -89,16 +89,16 @@ class RulesDetail {
     // UPDATE
     public function update($id, $data) {
         $stmt = $this->conn->prepare(
-            "UPDATE " . $this->conditionsTable . " 
-            SET id_rule = ?, 
+            "UPDATE " . $this->kondisiTable . " 
+            SET id_rules = ?, 
                 id_kriteria = ?, 
                 jawaban = ?
-            WHERE id_condition = ?"
+            WHERE id_kondisi = ?"
         );
 
         $stmt->bind_param(
             "iiii",
-            $data['id_rule'],
+            $data['id_rules'],
             $data['id_kriteria'],
             $data['jawaban'],
             $id
@@ -106,7 +106,7 @@ class RulesDetail {
 
         if ($stmt->execute()) {
             // ambil data terbaru setelah update
-            return $this->getByConditionId($id);
+            return $this->getByKondisiId($id);
         } else {
             return false;
         }
@@ -115,7 +115,7 @@ class RulesDetail {
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
-            "DELETE FROM " . $this->conditionsTable . " WHERE id_condition = ?"
+            "DELETE FROM " . $this->kondisiTable . " WHERE id_kondisi = ?"
         );
 
         $stmt->bind_param("i", $id);

@@ -44,15 +44,14 @@ class Kriteria {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->table} (kode_kriteria, nama_kriteria, pertanyaan, deskripsi) VALUES (?, ?, ?, ?)"
+            "INSERT INTO {$this->table} (kode_kriteria, nama_kriteria, pertanyaan) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
-            "ssss",
+            "sss",
             $data['kode_kriteria'],
             $data['nama_kriteria'],
-            $data['pertanyaan'],
-            $data['deskripsi']
+            $data['pertanyaan']
         );
 
         if ($stmt->execute()) {
@@ -71,17 +70,15 @@ class Kriteria {
             "UPDATE " . $this->table . " 
             SET kode_kriteria = ?, 
                 nama_kriteria = ?, 
-                pertanyaan = ?,
-                deskripsi = ? 
+                pertanyaan = ?
             WHERE id_kriteria = ?"
         );
 
         $stmt->bind_param(
-            "ssssi",
+            "sssi",
             $data['kode_kriteria'],
             $data['nama_kriteria'],
             $data['pertanyaan'],
-            $data['deskripsi'],
             $id
         );
 

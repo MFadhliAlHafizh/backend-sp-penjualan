@@ -1,7 +1,7 @@
 <?php
-class Platform {
+class Penyebab {
     private $conn;
-    private $table = "platform";
+    private $table = "penyebab";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -26,7 +26,7 @@ class Platform {
     // GET BY ID
     public function getById($id) {
         $stmt = $this->conn->prepare(
-            "SELECT * FROM " . $this->table . " WHERE id_platform = ?"
+            "SELECT * FROM " . $this->table . " WHERE id_penyebab = ?"
         );
 
         $stmt->bind_param("i", $id);
@@ -44,15 +44,15 @@ class Platform {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->table} (kode_platform, nama_platform, deskripsi, link_toko) VALUES (?, ?, ?, ?)"
+            "INSERT INTO {$this->table} (kode_penyebab, nama_penyebab, deskripsi, solusi) VALUES (?, ?, ?, ?)"
         );
 
         $stmt->bind_param(
             "ssss",
-            $data['kode_platform'],
-            $data['nama_platform'],
+            $data['kode_penyebab'],
+            $data['nama_penyebab'],
             $data['deskripsi'],
-            $data['link_toko']
+            $data['solusi']
         );
 
         if ($stmt->execute()) {
@@ -69,19 +69,19 @@ class Platform {
     public function update($id, $data) {
         $stmt = $this->conn->prepare(
             "UPDATE " . $this->table . " 
-            SET kode_platform = ?, 
-                nama_platform = ?, 
+            SET kode_penyebab = ?, 
+                nama_penyebab = ?, 
                 deskripsi = ? ,
-                link_toko = ?
-            WHERE id_platform = ?"
+                solusi = ?
+            WHERE id_penyebab = ?"
         );
 
         $stmt->bind_param(
             "ssssi",
-            $data['kode_platform'],
-            $data['nama_platform'],
+            $data['kode_penyebab'],
+            $data['nama_penyebab'],
             $data['deskripsi'],
-            $data['link_toko'],
+            $data['solusi'],
             $id
         );
 
@@ -96,7 +96,7 @@ class Platform {
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
-            "DELETE FROM " . $this->table . " WHERE id_platform = ?"
+            "DELETE FROM " . $this->table . " WHERE id_penyebab = ?"
         );
 
         $stmt->bind_param("i", $id);

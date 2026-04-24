@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once __DIR__ . '/../models/PlatformModel.php';
+require_once __DIR__ . '/../models/PenyebabModel.php';
 
 header("Content-Type: application/json");
 
@@ -31,7 +31,7 @@ if (!$db) {
     exit();
 }
 
-$platform = new Platform($db);
+$penyebab = new Penyebab($db);
 
 // parsing input JSON
 $input = json_decode(file_get_contents("php://input"), true);
@@ -45,13 +45,13 @@ $id = $segments[1] ?? null;
 
 switch ($resource) {
 
-    case 'platform':
+    case 'penyebab':
 
         // GET ALL atau GET BY ID
         if ($method === 'GET') {
 
             if ($id) {
-                $result = $platform->getById($id);
+                $result = $penyebab->getById($id);
 
                 if ($result) {
                     http_response_code(200);
@@ -61,7 +61,7 @@ switch ($resource) {
                     response("error", null, "Data not found");
                 }
             } else {
-                $result = $platform->getAll();
+                $result = $penyebab->getAll();
 
                 if ($result !== false) {
                     http_response_code(200);
@@ -83,7 +83,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $platform->create($input);
+            $result = $penyebab->create($input);
 
             if ($result) {
                 http_response_code(201);
@@ -104,7 +104,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $platform->update($id, $input);
+            $result = $penyebab->update($id, $input);
 
             if ($result) {
                 http_response_code(200);
@@ -125,7 +125,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $platform->delete($id);
+            $result = $penyebab->delete($id);
 
             if ($result) {
                 http_response_code(200);
