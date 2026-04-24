@@ -9,7 +9,7 @@ class Akun {
 
     // GET ALL
     public function getAll() {
-        $query = "SELECT * FROM " . $this->table;
+        $query = "SELECT * FROM " . $this->table . " ORDER BY peran ASC";
         $result = $this->conn->query($query);
 
         if ($result) {
