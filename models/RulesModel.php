@@ -17,6 +17,7 @@ class Rules {
             FROM {$this->rulesTable} r
             JOIN {$this->penyebabTable} p
             ON r.id_penyebab = p.id_penyebab
+            ORDER BY kode_rules ASC
         ";
         $result = $this->conn->query($query);
 

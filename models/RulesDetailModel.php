@@ -23,6 +23,7 @@ class RulesDetail {
                 rc.id_kondisi,
                 rc.jawaban,
 
+                k.kode_kriteria,
                 k.nama_kriteria,
                 k.pertanyaan
             FROM {$this->rulesTable} r
@@ -30,6 +31,7 @@ class RulesDetail {
             JOIN {$this->kondisiTable} rc ON r.id_rules = rc.id_rules
             JOIN {$this->kriteriaTable} k ON rc.id_kriteria = k.id_kriteria
             WHERE r.id_rules = ?
+            ORDER BY kode_kriteria ASC
         ");
 
         $stmt->bind_param("i", $idRules);
