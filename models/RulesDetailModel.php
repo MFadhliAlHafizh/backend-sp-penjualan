@@ -88,32 +88,6 @@ class RulesDetail {
         }
     }
 
-    // UPDATE
-    public function update($id, $data) {
-        $stmt = $this->conn->prepare(
-            "UPDATE " . $this->kondisiTable . " 
-            SET id_rules = ?, 
-                id_kriteria = ?, 
-                jawaban = ?
-            WHERE id_kondisi = ?"
-        );
-
-        $stmt->bind_param(
-            "iiii",
-            $data['id_rules'],
-            $data['id_kriteria'],
-            $data['jawaban'],
-            $id
-        );
-
-        if ($stmt->execute()) {
-            // ambil data terbaru setelah update
-            return $this->getByKondisiId($id);
-        } else {
-            return false;
-        }
-    }
-
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(

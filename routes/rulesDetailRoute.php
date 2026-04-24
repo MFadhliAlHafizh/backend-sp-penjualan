@@ -87,27 +87,6 @@ switch ($subResource) {
             exit();
         }
 
-        // UPDATE
-        if ($method === 'PUT') {
-
-            if (!$id || !$input) {
-                http_response_code(400);
-                response("error", null, "Invalid ID or input");
-                exit();
-            }
-
-            $result = $rulesDetail->update($id, $input);
-
-            if ($result) {
-                http_response_code(200);
-                response("success", $result, "Data updated successfully");
-            } else {
-                http_response_code(500);
-                response("error", null, "Failed to update data");
-            }
-            exit();
-        }
-
         // DELETE
         if ($method === 'DELETE') {
 
