@@ -19,6 +19,7 @@ class RulesDetail {
                 r.total_kondisi,
 
                 p.nama_penyebab,
+                p.deskripsi,
 
                 rc.id_kondisi,
                 rc.jawaban,
