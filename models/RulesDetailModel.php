@@ -1,7 +1,7 @@
 <?php
 class RulesDetail {
     private $conn;
-    private $kriteriaTable = "kriteria";
+    private $gejalaTable = "gejala";
     private $penyebabTable = "penyebab";
     private $rulesTable = "rules";
     private $kondisiTable = "kondisi";
@@ -24,15 +24,15 @@ class RulesDetail {
                 rc.id_kondisi,
                 rc.jawaban,
 
-                k.kode_kriteria,
-                k.nama_kriteria,
+                k.kode_gejala,
+                k.nama_gejala,
                 k.pertanyaan
             FROM {$this->rulesTable} r
             JOIN {$this->penyebabTable} p ON r.id_penyebab = p.id_penyebab
             JOIN {$this->kondisiTable} rc ON r.id_rules = rc.id_rules
-            JOIN {$this->kriteriaTable} k ON rc.id_kriteria = k.id_kriteria
+            JOIN {$this->gejalaTable} k ON rc.id_gejala = k.id_gejala
             WHERE r.id_rules = ?
-            ORDER BY kode_kriteria ASC
+            ORDER BY kode_gejala ASC
         ");
 
         $stmt->bind_param("i", $idRules);
@@ -69,13 +69,13 @@ class RulesDetail {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->kondisiTable} (id_rules, id_kriteria, jawaban) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->kondisiTable} (id_rules, id_gejala, jawaban) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
             "iii",
             $data['id_rules'],
-            $data['id_kriteria'],
+            $data['id_gejala'],
             $data['jawaban']
         );
 

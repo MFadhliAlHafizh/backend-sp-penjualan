@@ -1,7 +1,7 @@
 <?php
-class Kriteria {
+class Gejala {
     private $conn;
-    private $table = "kriteria";
+    private $table = "gejala";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -9,7 +9,7 @@ class Kriteria {
 
     // GET ALL
     public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY kode_kriteria ASC";
+        $query = "SELECT * FROM " . $this->table . " ORDER BY kode_gejala ASC";
         $result = $this->conn->query($query);
 
         if ($result) {
@@ -26,7 +26,7 @@ class Kriteria {
     // GET BY ID
     public function getById($id) {
         $stmt = $this->conn->prepare(
-            "SELECT * FROM " . $this->table . " WHERE id_kriteria = ?"
+            "SELECT * FROM " . $this->table . " WHERE id_gejala = ?"
         );
 
         $stmt->bind_param("i", $id);
@@ -44,13 +44,13 @@ class Kriteria {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->table} (kode_kriteria, nama_kriteria, pertanyaan) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->table} (kode_gejala, nama_gejala, pertanyaan) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
             "sss",
-            $data['kode_kriteria'],
-            $data['nama_kriteria'],
+            $data['kode_gejala'],
+            $data['nama_gejala'],
             $data['pertanyaan']
         );
 
@@ -68,16 +68,16 @@ class Kriteria {
     public function update($id, $data) {
         $stmt = $this->conn->prepare(
             "UPDATE " . $this->table . " 
-            SET kode_kriteria = ?, 
-                nama_kriteria = ?, 
+            SET kode_gejala = ?, 
+                nama_gejala = ?, 
                 pertanyaan = ?
-            WHERE id_kriteria = ?"
+            WHERE id_gejala = ?"
         );
 
         $stmt->bind_param(
             "sssi",
-            $data['kode_kriteria'],
-            $data['nama_kriteria'],
+            $data['kode_gejala'],
+            $data['nama_gejala'],
             $data['pertanyaan'],
             $id
         );
@@ -93,7 +93,7 @@ class Kriteria {
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
-            "DELETE FROM " . $this->table . " WHERE id_kriteria = ?"
+            "DELETE FROM " . $this->table . " WHERE id_gejala = ?"
         );
 
         $stmt->bind_param("i", $id);

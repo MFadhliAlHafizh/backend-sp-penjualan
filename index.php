@@ -10,8 +10,8 @@ $segments = explode('/', $url);
 $resource = $segments[0] ?? '';
 
 switch ($resource) {
-    case 'kriteria':
-        require_once __DIR__ . '/routes/kriteriaRoute.php';
+    case 'gejala':
+        require_once __DIR__ . '/routes/gejalaRoute.php';
         break;
 
     case 'penyebab':

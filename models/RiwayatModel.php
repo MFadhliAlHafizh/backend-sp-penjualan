@@ -3,7 +3,7 @@ class Riwayat {
     private $conn;
     private $konsultasiTable = "konsultasi";
     private $akunTable = "akun";
-    private $kriteriaTable = "kriteria";
+    private $gejalaTable = "gejala";
     private $penyebabTable = "penyebab";
     private $jawabanKonsultasiTable = "jawaban_konsultasi";
     private $hasilKonsultasiTable = "hasil_konsultasi";
@@ -78,9 +78,9 @@ class Riwayat {
                 kr.pertanyaan,
                 jk.jawaban_user
             FROM {$this->jawabanKonsultasiTable} jk
-            JOIN {$this->kriteriaTable} kr ON jk.id_kriteria = kr.id_kriteria
+            JOIN {$this->gejalaTable} kr ON jk.id_gejala = kr.id_gejala
             WHERE jk.id_konsultasi = ?
-            ORDER BY kr.id_kriteria ASC"
+            ORDER BY kr.id_gejala ASC"
         );
 
         $stmt->bind_param("i", $id);

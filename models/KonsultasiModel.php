@@ -28,11 +28,11 @@ class Konsultasi {
 
         // 2️⃣ Simpan jawaban user
         $stmtJawaban = $this->conn->prepare(
-            "INSERT INTO {$this->tableJawaban} (id_konsultasi, id_kriteria, jawaban_user) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->tableJawaban} (id_konsultasi, id_gejala, jawaban_user) VALUES (?, ?, ?)"
         );
 
-        foreach ($jawaban as $id_kriteria => $jwb) {
-            $stmtJawaban->bind_param("iii", $id_konsultasi, $id_kriteria, $jwb);
+        foreach ($jawaban as $id_gejala => $jwb) {
+            $stmtJawaban->bind_param("iii", $id_konsultasi, $id_gejala, $jwb);
             $stmtJawaban->execute();
         }
 
@@ -45,7 +45,7 @@ class Konsultasi {
                 p.nama_penyebab,
                 p.deskripsi,
                 p.solusi,
-                rc.id_kriteria,
+                rc.id_gejala,
                 rc.jawaban AS jawaban_rules
             FROM {$this->tableRules} r
             JOIN {$this->tableKondisi} rc ON r.id_rules = rc.id_rules
@@ -77,7 +77,7 @@ class Konsultasi {
             }
 
             $grouped[$id_rules]["kondisi"][] = [
-                "id_kriteria" => $row['id_kriteria'],
+                "id_gejala" => $row['id_gejala'],
                 "jawaban_rules" => $row['jawaban_rules']
             ];
         }
@@ -89,7 +89,7 @@ class Konsultasi {
             $terpenuhi = 0;
 
             foreach ($rule["kondisi"] as $c) {
-                $userInput = isset($jawaban[$c["id_kriteria"]]) ? $jawaban[$c["id_kriteria"]] : 0;
+                $userInput = isset($jawaban[$c["id_gejala"]]) ? $jawaban[$c["id_gejala"]] : 0;
 
                 if ($userInput == $c["jawaban_rules"]) {
                     $terpenuhi++;

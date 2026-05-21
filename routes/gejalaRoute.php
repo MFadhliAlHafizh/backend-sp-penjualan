@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once __DIR__ . '/../models/KriteriaModel.php';
+require_once __DIR__ . '/../models/GejalaModel.php';
 
 header("Content-Type: application/json");
 
@@ -31,7 +31,7 @@ if (!$db) {
     exit();
 }
 
-$kriteria = new Kriteria($db);
+$gejala = new Gejala($db);
 
 // parsing input JSON
 $input = json_decode(file_get_contents("php://input"), true);
@@ -45,13 +45,13 @@ $id = $segments[1] ?? null;
 
 switch ($resource) {
 
-    case 'kriteria':
+    case 'gejala':
 
         // GET ALL atau GET BY ID
         if ($method === 'GET') {
 
             if ($id) {
-                $result = $kriteria->getById($id);
+                $result = $gejala->getById($id);
 
                 if ($result) {
                     http_response_code(200);
@@ -61,7 +61,7 @@ switch ($resource) {
                     response("error", null, "Data not found");
                 }
             } else {
-                $result = $kriteria->getAll();
+                $result = $gejala->getAll();
 
                 if ($result !== false) {
                     http_response_code(200);
@@ -83,7 +83,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $kriteria->create($input);
+            $result = $gejala->create($input);
 
             if ($result) {
                 http_response_code(201);
@@ -104,7 +104,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $kriteria->update($id, $input);
+            $result = $gejala->update($id, $input);
 
             if ($result) {
                 http_response_code(200);
@@ -125,7 +125,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $kriteria->delete($id);
+            $result = $gejala->delete($id);
 
             if ($result) {
                 http_response_code(200);
