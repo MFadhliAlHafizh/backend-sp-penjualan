@@ -101,8 +101,8 @@ class Riwayat {
                 p.nama_penyebab,
                 p.deskripsi,
                 p.solusi,
-                hk.terpenuhi,
-                hk.total_kondisi,
+                hk.rule_terpenuhi,
+                hk.total_rule,
                 hk.persen
             FROM {$this->hasilKonsultasiTable} hk
             JOIN {$this->penyebabTable} p ON hk.id_penyebab = p.id_penyebab

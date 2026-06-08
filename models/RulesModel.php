@@ -59,14 +59,14 @@ class Rules {
     // CREATE
     public function create($data) {
         $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->rulesTable} (kode_rules, id_penyebab, total_kondisi) VALUES (?, ?, ?)"
+            "INSERT INTO {$this->rulesTable} (kode_rules, id_penyebab, total_rule) VALUES (?, ?, ?)"
         );
 
         $stmt->bind_param(
             "sii",
             $data['kode_rules'],
             $data['id_penyebab'],
-            $data['total_kondisi']
+            $data['total_rule']
         );
 
         if ($stmt->execute()) {

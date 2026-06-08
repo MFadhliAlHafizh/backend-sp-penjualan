@@ -14,7 +14,7 @@ class Konsultasi {
     }
 
     public function rekomendasi($id_user, $jawaban) {
-        // 1️⃣ Insert konsultasi
+        // 1. Simpan konsultasi
         $stmt = $this->conn->prepare(
             "INSERT INTO {$this->tableKonsultasi} (id_user, tanggal) VALUES (?, NOW())"
         );
@@ -26,7 +26,7 @@ class Konsultasi {
 
         $id_konsultasi = $this->conn->insert_id;
 
-        // 2️⃣ Simpan jawaban user
+        // 2. Simpan jawaban user
         $stmtJawaban = $this->conn->prepare(
             "INSERT INTO {$this->tableJawaban} (id_konsultasi, id_gejala, jawaban_user) VALUES (?, ?, ?)"
         );
@@ -36,36 +36,39 @@ class Konsultasi {
             $stmtJawaban->execute();
         }
 
-        // 3️⃣ Ambil rules
+        // 3. Ambil seluruh rule
         $sql = "
             SELECT 
                 r.id_rules,
                 r.id_penyebab,
                 r.total_kondisi,
+
                 p.nama_penyebab,
                 p.deskripsi,
                 p.solusi,
-                rc.id_gejala,
-                rc.jawaban AS jawaban_rules
+
+                k.id_gejala,
+                k.jawaban AS jawaban_rules
             FROM {$this->tableRules} r
-            JOIN {$this->tableKondisi} rc ON r.id_rules = rc.id_rules
+            JOIN {$this->tableKondisi} k ON r.id_rules = k.id_rules
             JOIN {$this->tablePenyebab} p ON r.id_penyebab = p.id_penyebab
+            ORDER BY r.id_rules
         ";
 
         $result = $this->conn->query($sql);
 
         if (!$result) {
-            return ["error" => "Error DB"];
+            return ["error" => "Gagal mengambil data rule"];
         }
 
-        // 4️⃣ Grouping rules
-        $grouped = [];
+        // 4. Group rule
+        $groupedRules = [];
 
         while ($row = $result->fetch_assoc()) {
             $id_rules = $row['id_rules'];
 
-            if (!isset($grouped[$id_rules])) {
-                $grouped[$id_rules] = [
+            if (!isset($groupedRules[$id_rules])) {
+                $groupedRules[$id_rules] = [
                     "id_rules" => $id_rules,
                     "id_penyebab" => $row['id_penyebab'],
                     "nama_penyebab" => $row['nama_penyebab'],
@@ -76,63 +79,128 @@ class Konsultasi {
                 ];
             }
 
-            $grouped[$id_rules]["kondisi"][] = [
+            $groupedRules[$id_rules]["kondisi"][] = [
                 "id_gejala" => $row['id_gejala'],
                 "jawaban_rules" => $row['jawaban_rules']
             ];
         }
 
-        // 5️⃣ Hitung forward chaining
-        $resultAkhir = [];
+        // 5. Evaluasi rule
+        $hasilPenyebab = [];
 
-        foreach ($grouped as $rule) {
+        foreach ($groupedRules as $rule) {
             $terpenuhi = 0;
 
-            foreach ($rule["kondisi"] as $c) {
-                $userInput = isset($jawaban[$c["id_gejala"]]) ? $jawaban[$c["id_gejala"]] : 0;
+            foreach ($rule["kondisi"] as $kondisi) {
+                $userInput = isset(
+                    $jawaban[$kondisi["id_gejala"]]
+                )
+                    ? $jawaban[$kondisi["id_gejala"]]
+                    : 0;
 
-                if ($userInput == $c["jawaban_rules"]) {
+                if ($userInput == $kondisi["jawaban_rules"]) {
                     $terpenuhi++;
                 }
             }
 
-            $persen = round(($terpenuhi / $rule["total_kondisi"]) * 100);
+            // Rule terpenuhi jika semua kondisi terpenuhi
+            $ruleTerpenuhi =
+                ($terpenuhi == $rule["total_kondisi"]);
+
+            $idPenyebab = $rule["id_penyebab"];
+
+            // Inisialisasi penyebab
+            if (!isset($hasilPenyebab[$idPenyebab])) {
+
+                $hasilPenyebab[$idPenyebab] = [
+                    "id_penyebab" => $idPenyebab,
+                    "nama_penyebab" => $rule["nama_penyebab"],
+                    "deskripsi" => $rule["deskripsi"],
+                    "solusi" => $rule["solusi"],
+                    "rule_terpenuhi" => 0,
+                    "total_rule" => 0
+                ];
+            }
+
+            // Total rule milik penyebab
+            $hasilPenyebab[$idPenyebab]["total_rule"]++;
+
+            // Tambah jika rule terpenuhi
+            if ($ruleTerpenuhi) {
+                $hasilPenyebab[$idPenyebab]["rule_terpenuhi"]++;
+            }
+        }
+
+        // 6. Hitung persentase
+        $resultAkhir = [];
+
+        foreach ($hasilPenyebab as $penyebab) {
+
+            $persen =
+                $penyebab["total_rule"] > 0
+                ? round(
+                    ($penyebab["rule_terpenuhi"] / $penyebab["total_rule"]) * 100, 2
+                )
+                : 0;
 
             $resultAkhir[] = [
-                "id_penyebab" => $rule["id_penyebab"],
-                "nama_penyebab" => $rule["nama_penyebab"],
-                "deskripsi" => $rule["deskripsi"],
-                "solusi" => $rule["solusi"],
-                "terpenuhi" => $terpenuhi,
-                "total_kondisi" => $rule["total_kondisi"],
+                "id_penyebab" => $penyebab["id_penyebab"],
+                "nama_penyebab" => $penyebab["nama_penyebab"],
+                "deskripsi" => $penyebab["deskripsi"],
+                "solusi" => $penyebab["solusi"],
+                "rule_terpenuhi" => $penyebab["rule_terpenuhi"],
+                "total_rule" => $penyebab["total_rule"],
                 "persen" => $persen
             ];
         }
 
-        // 6️⃣ Sorting & ambil top 2
+        // 7. Urutkan tertinggi
         usort($resultAkhir, function ($a, $b) {
-            return $b['persen'] <=> $a['persen'];
+
+            if ($b['persen'] == $a['persen']) {
+                return $b['rule_terpenuhi']
+                    <=> $a['rule_terpenuhi'];
+            }
+
+            return $b['persen']
+                <=> $a['persen'];
         });
 
-        $top2 = array_slice($resultAkhir, 0, 2);
-
-        // 7️⃣ Simpan hasil
-        $stmtHasil = $this->conn->prepare(
-            "INSERT INTO {$this->tableHasil} (id_konsultasi, id_penyebab, terpenuhi, total_kondisi, persen) VALUES (?, ?, ?, ?, ?)"
+        // 8. Ambil Top 2
+        $top2 = array_slice(
+            $resultAkhir,
+            0,
+            2
         );
 
-        foreach ($top2 as $h) {
+        // 9. Simpan hasil
+        $stmtHasil = $this->conn->prepare(
+            "INSERT INTO {$this->tableHasil}
+            (
+                id_konsultasi,
+                id_penyebab,
+                rule_terpenuhi,
+                total_rule,
+                persen
+            )
+            VALUES (?, ?, ?, ?, ?)"
+        );
+
+        foreach ($top2 as $hasil) {
+
             $stmtHasil->bind_param(
-                "iiiii",
+                "iiiid",
                 $id_konsultasi,
-                $h["id_penyebab"],
-                $h["terpenuhi"],
-                $h["total_kondisi"],
-                $h["persen"]
+                $hasil["id_penyebab"],
+                $hasil["rule_terpenuhi"],
+                $hasil["total_rule"],
+                $hasil["persen"]
             );
+
             $stmtHasil->execute();
         }
 
+        // 10. Return hasil
         return $top2;
     }
 }
