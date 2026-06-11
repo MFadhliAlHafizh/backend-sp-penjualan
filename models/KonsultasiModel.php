@@ -41,7 +41,6 @@ class Konsultasi {
             SELECT 
                 r.id_rules,
                 r.id_penyebab,
-                r.total_kondisi,
 
                 p.nama_penyebab,
                 p.deskripsi,
@@ -74,7 +73,6 @@ class Konsultasi {
                     "nama_penyebab" => $row['nama_penyebab'],
                     "deskripsi" => $row['deskripsi'],
                     "solusi" => $row['solusi'],
-                    "total_kondisi" => $row['total_kondisi'],
                     "kondisi" => []
                 ];
             }
@@ -103,9 +101,9 @@ class Konsultasi {
                 }
             }
 
-            // Rule terpenuhi jika semua kondisi terpenuhi
-            $ruleTerpenuhi =
-                ($terpenuhi == $rule["total_kondisi"]);
+            $totalKondisi = count($rule["kondisi"]);
+
+            $ruleTerpenuhi = ($terpenuhi == $totalKondisi);
 
             $idPenyebab = $rule["id_penyebab"];
 

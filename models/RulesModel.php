@@ -2,7 +2,6 @@
 class Rules {
     private $conn;
     private $rulesTable = "rules";
-    private $penyebabTable = "penyebab";
 
     public function __construct($db) {
         $this->conn = $db;
@@ -11,13 +10,12 @@ class Rules {
     // GET ALL
     public function getAll() {
         $query = "
-            SELECT 
-                r.*,
+            SELECT
+                p.id_penyebab,
+                p.kode_penyebab,
                 p.nama_penyebab
-            FROM {$this->rulesTable} r
-            JOIN {$this->penyebabTable} p
-            ON r.id_penyebab = p.id_penyebab
-            ORDER BY kode_rules ASC
+            FROM penyebab p
+            ORDER BY p.kode_penyebab ASC
         ";
         $result = $this->conn->query($query);
 
@@ -36,47 +34,12 @@ class Rules {
     public function getById($id) {
         $stmt = $this->conn->prepare("
             SELECT
-                r.*,
-                p.nama_penyebab
-            FROM {$this->rulesTable} r
-            JOIN {$this->penyebabTable} p
-            ON r.id_penyebab = p.id_penyebab
-            WHERE r.id_rules = ?
+                id_penyebab,
+                kode_penyebab,
+                nama_penyebab
+            FROM penyebab
+            WHERE id_penyebab = ?
         ");
-
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-
-        if ($result && $result->num_rows > 0) {
-            return $result->fetch_assoc();
-        } else {
-            return null;
-        }
-    }
-
-    // CREATE
-    public function create($data) {
-        $stmt = $this->conn->prepare(
-            "INSERT INTO {$this->rulesTable} (kode_rules, id_penyebab, total_rule) VALUES (?, ?, ?)"
-        );
-
-        $stmt->bind_param(
-            "sii",
-            $data['kode_rules'],
-            $data['id_penyebab'],
-            $data['total_rule']
-        );
-
-        if ($stmt->execute()) {
-            $id = $this->conn->insert_id;
-
-            // ambil data yang baru dibuat
-            return $this->getById($id);
-        } else {
-            return false;
-        }
     }
 
     // DELETE

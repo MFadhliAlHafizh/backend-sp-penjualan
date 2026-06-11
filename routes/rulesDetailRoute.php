@@ -54,7 +54,7 @@ switch ($subResource) {
     case 'detail':
 
         if ($method === 'GET') {
-            $result = $rulesDetail->getByRulesId($id);
+            $result = $rulesDetail->getByPenyebabId($id);
 
             if ($result && count($result) > 0) {
                 http_response_code(200);

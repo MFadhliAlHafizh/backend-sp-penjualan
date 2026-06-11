@@ -74,27 +74,6 @@ switch ($resource) {
             exit();
         }
 
-        // CREATE
-        if ($method === 'POST') {
-
-            if (!$input) {
-                http_response_code(400);
-                response("error", null, "Invalid input");
-                exit();
-            }
-
-            $result = $rules->create($input);
-
-            if ($result) {
-                http_response_code(201);
-                response("success", $result, "Data created successfully");
-            } else {
-                http_response_code(500);
-                response("error", null, "Failed to create data");
-            }
-            exit();
-        }
-
         // DELETE
         if ($method === 'DELETE') {
 
