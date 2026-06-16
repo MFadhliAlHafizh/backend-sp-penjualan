@@ -1,5 +1,5 @@
 <?php
-class RulesDetail {
+class PenyebabDetail {
     private $conn;
     private $rulesTable = "rules";
     private $kondisiTable = "kondisi";
@@ -16,6 +16,7 @@ class RulesDetail {
                 r.kode_rules,
                 p.kode_penyebab,
                 p.nama_penyebab,
+                p.solusi,
                 p.deskripsi,
 
                 GROUP_CONCAT(

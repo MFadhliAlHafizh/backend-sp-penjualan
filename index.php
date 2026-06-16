@@ -15,8 +15,12 @@ switch ($resource) {
         break;
 
     case 'penyebab':
-        require_once __DIR__ . '/routes/penyebabRoute.php';
-        break;
+        if (($segments[1] ?? '') === 'detail') {
+            require_once __DIR__ . '/routes/penyebabDetailRoute.php';
+        } else {
+            require_once __DIR__ . '/routes/penyebabRoute.php';
+        }
+        break;        
 
     case 'register':
     case 'login':
@@ -25,14 +29,6 @@ switch ($resource) {
 
     case 'akun':
         require_once __DIR__ . '/routes/akunRoute.php';
-        break;
-
-    case 'rules':
-        if (($segments[1] ?? '') === 'detail') {
-            require_once __DIR__ . '/routes/rulesDetailRoute.php';
-        } else {
-            require_once __DIR__ . '/routes/rulesRoute.php';
-        }
         break;
 
     case 'riwayat':

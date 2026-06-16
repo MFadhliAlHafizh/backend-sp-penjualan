@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once __DIR__ . '/../models/RulesModel.php';
+require_once __DIR__ . '/../models/PenyebabDetailModel.php';
 
 header("Content-Type: application/json");
 
@@ -31,45 +31,58 @@ if (!$db) {
     exit();
 }
 
-$rules = new Rules($db);
+$penyebabDetail = new PenyebabDetail($db);
 
 // parsing input JSON
 $input = json_decode(file_get_contents("php://input"), true);
 
-// ambil method & endpoint
 $method = $_SERVER['REQUEST_METHOD'];
 $request = $_GET['url'] ?? '';
 $segments = explode('/', trim($request, '/'));
-$resource = $segments[0] ?? null;
-$id = $segments[1] ?? null;
 
-switch ($resource) {
+$resource = $segments[0] ?? null;    // penyebab
+$subResource = $segments[1] ?? null; // detail
+$id = $segments[2] ?? null;          // 1
 
-    case 'rules':
+if ($resource !== 'penyebab') {
+    http_response_code(404);
+    response("error", null, "Route not found");
+    exit();
+}
 
-        // GET ALL atau GET BY ID
+switch ($subResource) {
+    case 'detail':
+
         if ($method === 'GET') {
+            $result = $penyebabDetail->getByPenyebabId($id);
 
-            if ($id) {
-                $result = $rules->getById($id);
-
-                if ($result) {
-                    http_response_code(200);
-                    response("success", $result, "Data found");
-                } else {
-                    http_response_code(404);
-                    response("error", null, "Data not found");
-                }
+            if ($result && count($result) > 0) {
+                http_response_code(200);
+                response("success", $result, "Data found");
             } else {
-                $result = $rules->getAll();
+                http_response_code(404);
+                response("error", null, "Data not found");
+            }
+            exit();
+        }
 
-                if ($result !== false) {
-                    http_response_code(200);
-                    response("success", $result, "Data retrieved successfully");
-                } else {
-                    http_response_code(500);
-                    response("error", null, "Failed to retrieve data");
-                }
+        // CREATE
+        if ($method === 'POST') {
+
+            if (!$input) {
+                http_response_code(400);
+                response("error", null, "Invalid input");
+                exit();
+            }
+
+            $result = $penyebabDetail->create($input);
+
+            if ($result) {
+                http_response_code(201);
+                response("success", $result, "Data created successfully");
+            } else {
+                http_response_code(500);
+                response("error", null, "Failed to create data");
             }
             exit();
         }
@@ -83,7 +96,7 @@ switch ($resource) {
                 exit();
             }
 
-            $result = $rules->delete($id);
+            $result = $penyebabDetail->delete($id);
 
             if ($result) {
                 http_response_code(200);
@@ -98,6 +111,6 @@ switch ($resource) {
 
     default:
         http_response_code(404);
-        response("error", null, "Route not found");
-        break;
+        response("error", null, "Sub route not found");
+        exit();
 }
