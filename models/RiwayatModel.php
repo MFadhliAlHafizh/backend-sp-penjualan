@@ -21,7 +21,8 @@ class Riwayat {
                         a.email
                     FROM {$this->konsultasiTable} k
                     JOIN {$this->akunTable} a 
-                    ON k.id_user = a.id_user";
+                    ON k.id_user = a.id_user
+                    ORDER BY k.tanggal DESC";
 
             $stmt = $this->conn->prepare($query);
         } else {
@@ -32,7 +33,8 @@ class Riwayat {
                     FROM {$this->konsultasiTable} k
                     JOIN {$this->akunTable} a 
                     ON k.id_user = a.id_user
-                    WHERE k.id_user = ?";
+                    WHERE k.id_user = ?
+                    ORDER BY k.tanggal DESC";
 
             $stmt = $this->conn->prepare($query);
             $stmt->bind_param("i", $id_user);
