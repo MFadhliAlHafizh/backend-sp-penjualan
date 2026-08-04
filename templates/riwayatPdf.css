@@ -1,0 +1,214 @@
+@page {
+    margin-inline: 40px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 11px;
+    color: #222;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, p {
+    margin: 0;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #555;
+    margin: 12px 0 20px;
+}
+
+.header{
+    margin-bottom:15px;
+}
+
+.header-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.logo-cell{
+    width:90px;
+    text-align:center;
+    vertical-align:middle;
+}
+
+.logo{
+    width:70px;
+    height:70px;
+}
+
+.title-cell {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.title-cell h1,
+.title-cell h2,
+.title-cell p {
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+}
+
+.title-cell h1 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #0f4c81;
+}
+
+.title-cell h2 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+.title-cell p {
+    font-size: 12px;
+    color: #555;
+}
+
+.double-line{
+    border-top:3px solid #000;
+    border-bottom:1px solid #000;
+    height:3px;
+    margin-block:10px;
+}
+
+.document-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+h3 {
+    font-size: 13px;
+    margin-top: 18px;
+    margin-bottom: 10px;
+    padding: 6px 8px;
+    background: #efefef;
+    border-left: 4px solid #444;
+}
+
+.info-table,
+.summary-table,
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.info-table td,
+.summary-table td,
+.result-table td {
+    /* padding: 5px 4px; */
+    vertical-align: top;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+}
+
+.table th {
+    background: #d9d9d9;
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.table td {
+    border: 1px solid #000;
+    padding: 5px;
+    vertical-align: top;
+}
+
+.center {
+    text-align: center;
+}
+
+.result-box {
+    border: 1px solid #999;
+    padding: 12px;
+    margin-bottom: 18px;
+    page-break-inside: avoid;
+}
+
+.result-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #0f4c81;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.description {
+    text-align: justify;
+    margin-bottom: 10px;
+}
+
+.result-box ol {
+    margin: 5px 0 0 18px;
+    padding: 0;
+}
+
+.result-box li {
+    margin-bottom: 5px;
+    text-align: justify;
+}
+
+.note {
+    margin-top: 18px;
+    padding: 10px 12px;
+    border: 1px solid #888;
+    background: #f7f7f7;
+    text-align: justify;
+}
+
+.signature-table {
+    width: 100%;
+    margin-top: 60px;
+    border-collapse: collapse;
+}
+
+.signature-content {
+    text-align: center;
+    vertical-align: top;
+}
+
+.footer {
+    margin-top: 105px;
+    border-top: 1px solid #999;
+    padding-top: 10px;
+    font-size: 10px;
+    text-align: center;
+    color: #555;
+}
+
+.page-break {
+    page-break-after: always;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}

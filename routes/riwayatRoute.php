@@ -11,10 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 require_once __DIR__ . '/../models/RiwayatModel.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
-header("Content-Type: application/json");
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 function response($status, $data = null, $message = "") {
+    header("Content-Type: application/json");
     echo json_encode([
         "status" => $status,
         "message" => $message,
@@ -40,14 +43,15 @@ $request = $_GET['url'] ?? '';
 $segments = explode('/', trim($request, '/'));
 
 $resource = $segments[0] ?? null;
-$id = $segments[1] ?? null;
+$action = $segments[1] ?? null;
+$id = $segments[2] ?? null;
 
 switch ($resource) {
 
     case 'riwayat':
 
         // GET ALL
-        if ($method === 'GET' && !$id) {
+        if ($method === 'GET' && !$action) {
 
             $user = getUserFromToken();
             $id_user = $user['id_user'];
@@ -62,37 +66,72 @@ switch ($resource) {
                 http_response_code(500);
                 response("error", null, "Failed to retrieve data");
             }
+            exit();
         }
 
-        if ($method === 'GET' && $id) {
+        if ($method === 'GET' && is_numeric($action)) {
+            $data = $riwayat->getConsultationDetail($action);
 
-            $profile = $riwayat->getProfileByConsultationId($id);
-            $responses = $riwayat->getResponsesByConsultationId($id);
-            $results = $riwayat->getResultsByConsultationId($id);
-
-            if ($profile) {
+            if ($data) {
                 http_response_code(200);
-                response("success", [
-                    "profile" => $profile,
-                    "responses" => $responses,
-                    "results" => $results
-                ], "Detail retrieved successfully");
+                response("success", $data, "Detail retrieved successfully");
             } else {
                 http_response_code(404);
                 response("error", null, "Data not found");
             }
+            exit();
         }        
+
+        if ($method === 'GET' && $action === 'pdf' && is_numeric($id)) {
+            $user = getUserFromToken();
+
+            $id_user = $user['id_user'];
+            $peran   = $user['peran'];
+
+            if ($peran !== "admin" && !$riwayat->isOwner($id, $id_user)) {
+                http_response_code(403);
+                echo "Anda tidak memiliki akses ke data ini.";
+                exit();
+            }
+
+            $data = $riwayat->getConsultationDetail($id);
+            if (!$data) {
+                http_response_code(404);
+                echo "Data tidak ditemukan";
+                exit();
+            }
+
+            $profile   = $data['profile'];
+            $responses = $data['responses'];
+            $results   = $data['results'];
+            ob_start();
+
+            require __DIR__ . '/../templates/riwayatPdf.php';
+            $html = ob_get_clean();
+            $options = new Options();
+            $options->setIsRemoteEnabled(true);
+
+            $options->setChroot(realpath(__DIR__ . "/../"));
+            
+            $dompdf = new Dompdf($options);
+            $dompdf->loadHtml($html);
+            $dompdf->setPaper('A4', 'portrait');
+            $dompdf->render();
+            $dompdf->stream(
+                "Hasil_Identifikasi_{$id}.pdf", ["Attachment" => false]
+            );
+            exit();
+        }
 
         // DELETE
         if ($method === 'DELETE') {
-
-            if (!$id) {
+            if (!is_numeric($action)) {
                 http_response_code(400);
                 response("error", null, "ID is required");
                 exit();
             }
 
-            $result = $riwayat->delete($id);
+            $result = $riwayat->delete($action);
 
             if ($result) {
                 http_response_code(200);

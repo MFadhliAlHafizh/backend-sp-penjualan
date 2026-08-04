@@ -124,6 +124,43 @@ class Riwayat {
         return $data;
     }
 
+    public function getConsultationDetail($id) {
+        $profile = $this->getProfileByConsultationId($id);
+
+        if (!$profile) {
+            return null;
+        }
+
+        return [
+            "profile" => $profile,
+            "responses" => $this->getResponsesByConsultationId($id),
+            "results" => $this->getResultsByConsultationId($id),
+        ];
+    }
+
+    public function isOwner($id_konsultasi, $id_user) {
+
+        $stmt = $this->conn->prepare(
+            "SELECT id_user
+            FROM {$this->konsultasiTable}
+            WHERE id_konsultasi = ?"
+        );
+
+        $stmt->bind_param("i", $id_konsultasi);
+
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        if ($result->num_rows === 0) {
+            return false;
+        }
+
+        $row = $result->fetch_assoc();
+
+        return (int)$row['id_user'] === (int)$id_user;
+    }
+
     // DELETE
     public function delete($id) {
         $stmt = $this->conn->prepare(
