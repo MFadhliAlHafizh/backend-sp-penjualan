@@ -177,9 +177,7 @@ $formatter = new IntlDateFormatter(
             <td width="40%" class="signature-content">
                 Jakarta, <?= $formatter->format(time()) ?>
                 <br><br><br><br><br>
-                <strong>
-                    <?= htmlspecialchars($profile['username']) ?>
-                </strong>
+                <strong>Dr. Hj. Eva Sundari, SE., MM., C.R.B.C</strong>
             </td>
         </tr>
     </table>

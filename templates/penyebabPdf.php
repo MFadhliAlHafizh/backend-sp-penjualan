@@ -90,7 +90,7 @@ $formatter = new IntlDateFormatter(
                 Jakarta, <?= $formatter->format(time()) ?>
                 <br><br><br><br><br>
 
-                <strong>Administrator</strong>
+                <strong>Dr. Hj. Eva Sundari, SE., MM., C.R.B.C</strong>
             </td>
         </tr>
     </table>
